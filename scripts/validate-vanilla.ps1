@@ -21,5 +21,5 @@ foreach ($releaseId in @('26.1', '26.1.1', '26.1.2', '26.2', '26.3')) {
     } finally { Pop-Location }
     if ($LASTEXITCODE -ne 0) { throw "Vanilla oracle failed: $releaseId" }
 }
-& node scripts/compare-vanilla.js
+& node scripts/compare-vanilla.ts
 if ($LASTEXITCODE -ne 0) { throw 'Biome reference mismatch' }

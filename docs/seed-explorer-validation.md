@@ -57,7 +57,7 @@ Technische Ausschnittmessung auf dem oben genannten Rechner, Minecraft 26.3/Stan
 | 4 (Startansicht) | 1024×512 | 1.464 ms | 157.562 Bytes | 18.490 Bytes | WebP |
 | 1 | 600×300 | 93 ms | 21.379 Bytes | 1.810 Bytes | WebP |
 
-Damit ist die Startansicht etwa 88 % kleiner als JPEG 90, bei verlustfreien Biomfarben. Der WebP-Rasterpuffer ist auf 16 MiB begrenzt; zusätzlich benötigen Encoder und komprimierte Dateien Speicher. Der Prozess-RSS dieser Messreihe lag maximal bei 82,6 MB. Dies ist kein Browser-Speicherbenchmark. Wiederholbar mit node scripts/benchmark-export.js; Rohdaten: .cache/viewport-export-performance.json.
+Damit ist die Startansicht etwa 88 % kleiner als JPEG 90, bei verlustfreien Biomfarben. Der WebP-Rasterpuffer ist auf 16 MiB begrenzt; zusätzlich benötigen Encoder und komprimierte Dateien Speicher. Der Prozess-RSS dieser Messreihe lag maximal bei 82,6 MB. Dies ist kein Browser-Speicherbenchmark. Wiederholbar mit node scripts/benchmark-export.ts; Rohdaten: .cache/viewport-export-performance.json.
 
 ## Build und Auslieferung
 

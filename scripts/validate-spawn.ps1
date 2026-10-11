@@ -8,5 +8,5 @@ $fixtures = Get-Content -Raw -LiteralPath 'tests/spawn-fixtures.json' | ConvertF
 $difference = Compare-Object $native $fixtures -Property version, large, seed, x, z
 if ($difference) { $difference | Format-Table; throw 'Native spawn estimates differ from the fixtures' }
 Write-Output "All $($native.Count) native spawn reference fixtures match."
-node --test --test-name-pattern 'WASM spawn' tests/generator.test.js
+node --test --test-name-pattern 'WASM spawn' tests/generator.test.ts
 if ($LASTEXITCODE -ne 0) { throw 'WASM spawn comparison failed' }

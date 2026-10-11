@@ -160,6 +160,7 @@
   .page-container {
     @apply mx-auto w-full max-w-page px-4 sm:px-8;
   }
+  main .page-container { view-transition-name: page; }
   .footer-link {
     @apply rounded-sm transition-colors hover:text-foreground hover:underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary;
   }
@@ -183,6 +184,78 @@
 @layer base {
   :root {
     color-scheme: dark;
+    view-transition-name: none;
+    overflow-y: auto;
+    overflow-x: clip;
+  }
+
+  /* Paint surfaces to the edge, keeping their inner content at a constant width. */
+  #app { width: 100vw; }
+  #app > :where(header, main, footer) {
+    padding-inline-end: var(--scrollbar-width, 0px);
+  }
+
+  /* Only page content transitions; header, footer and background stay steady. */
+  ::view-transition { pointer-events: none; }
+  ::view-transition-group(page) {
+    animation-duration: 260ms;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  ::view-transition-old(page),
+  ::view-transition-new(page) {
+    mix-blend-mode: normal;
+  }
+  ::view-transition-old(page) {
+    animation: page-leave 140ms ease-out both;
+  }
+  ::view-transition-new(page) {
+    animation: page-enter 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes page-leave {
+    to { opacity: 0; transform: translateY(-6px); }
+  }
+  @keyframes page-enter {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-group(page),
+    ::view-transition-old(page),
+    ::view-transition-new(page) { animation: none; }
+  }
+
+  /* Keep native scrolling while matching the site's dark surfaces. */
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner {
+    background: var(--color-background);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    min-height: 40px;
+    border: 3px solid var(--color-background);
+    border-radius: 999px;
+    background: var(--color-border-strong);
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-primary-hover);
+  }
+
+  ::-webkit-scrollbar-thumb:active {
+    background-color: var(--color-primary);
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--color-border-strong) var(--color-background);
+    }
   }
 
   body {

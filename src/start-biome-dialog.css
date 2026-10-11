@@ -1,0 +1,124 @@
+.start-biome-dialog { box-sizing: border-box; width: min(52rem, calc(100vw - 2rem)); height: min(50rem, calc(100dvh - 2rem)); max-height: calc(100dvh - 2rem); margin: auto; padding: 1.25rem; overflow: auto; border: 1px solid var(--color-border-strong); border-radius: 1rem; background: var(--color-surface); color: var(--color-foreground); box-shadow: 0 24px 80px #0008; }
+.start-biome-dialog::backdrop { background: #03080dbb; backdrop-filter: blur(3px); }
+.start-biome-dialog {
+  opacity: 0;
+  transform: translateY(12px) scale(.98);
+  transition: opacity 180ms ease, transform 180ms cubic-bezier(.4, 0, 1, 1), display 180ms allow-discrete, overlay 180ms allow-discrete;
+}
+.start-biome-dialog[open] {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) 6rem auto;
+  gap: .875rem;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition-duration: 260ms;
+  transition-timing-function: cubic-bezier(.22, 1, .36, 1);
+}
+.start-biome-dialog::backdrop {
+  opacity: 0;
+  transition: opacity 180ms ease, display 180ms allow-discrete, overlay 180ms allow-discrete;
+}
+.start-biome-dialog[open]::backdrop { opacity: 1; transition-duration: 260ms; }
+@starting-style {
+  .start-biome-dialog[open] { opacity: 0; transform: translateY(12px) scale(.98); }
+  .start-biome-dialog[open]::backdrop { opacity: 0; }
+}
+.start-biome-dialog header, .start-biome-actions { display: flex; align-items: center; gap: .75rem; justify-content: space-between; }
+.start-biome-dialog header { margin: 0; padding-bottom: .75rem; border-bottom: 1px solid var(--color-border); }
+.start-biome-eyebrow { margin-bottom: .25rem; color: var(--color-foreground-muted); font-size: .625rem; font-weight: 600; letter-spacing: .14em; }
+.start-biome-dialog h2 { display: flex; align-items: center; gap: .625rem; font-size: 1.25rem; font-weight: 600; }
+.start-biome-dialog h2 i { display: grid; place-items: center; width: 2rem; height: 2rem; border: 1px solid var(--color-border); border-radius: .625rem; background: var(--color-surface-raised); font-size: 1rem; }
+.start-biome-dialog [data-start="close"] { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; padding: 0; color: var(--color-foreground-muted); background: transparent; border-color: transparent; }
+.start-biome-dialog [data-start="close"]:hover { color: var(--color-foreground); border-color: var(--color-border); }
+.start-biome-dialog form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) 14rem; align-items: end; gap: .875rem; }
+.start-biome-fields { display: contents; }
+.start-biome-fields label { display: flex; flex-direction: column; gap: .5rem; font-size: .875rem; }
+.start-biome-field-label { display: flex; align-items: center; gap: .5rem; color: var(--color-foreground-muted); font-size: .75rem; font-weight: 500; }
+.start-biome-field-label > i { color: var(--color-primary); font-size: .8125rem; }
+.start-biome-select { display: block; position: relative; }
+.start-biome-select > i { position: absolute; right: .875rem; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--color-foreground-muted); font-size: .625rem; }
+.start-biome-dialog select { width: 100%; appearance: none; }
+.start-biome-dialog :is(select, button, .start-biome-primary) { border: 1px solid var(--color-border-strong); border-radius: .625rem; background: var(--color-surface-raised); color: var(--color-foreground); padding: .625rem .875rem; font-size: .875rem; }
+.start-biome-dialog select { padding-right: 2.25rem; }
+.start-biome-dialog button { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; }
+.start-biome-dialog :is(button, a) { cursor: pointer; transition: background-color 180ms ease, border-color 180ms ease; }
+.start-biome-dialog button:hover { background: var(--color-surface-hover); }
+.start-biome-dialog :is(select, button, a):focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }
+.start-biome-dialog :is(button, select):disabled { opacity: .55; cursor: default; }
+.start-biome-dialog .start-biome-primary { display: inline-flex; justify-content: center; align-items: center; gap: .5rem; background: var(--color-primary); color: var(--color-background); border-color: var(--color-primary); font-weight: 600; text-decoration: none; box-shadow: inset 0 1px 0 #ffffff20, 0 3px 10px #0003; }
+.start-biome-primary > i { font-size: .8125rem; }
+.start-biome-dialog .start-biome-primary:hover { background: var(--color-primary-hover); }
+.start-biome-note, .start-biome-attribution { color: var(--color-foreground-muted); font-size: .75rem; line-height: 1.5; margin: 0; }
+.start-biome-attribution { margin-top: .25rem; }
+.start-biome-note { display: flex; align-items: baseline; gap: .5rem; font-size: .6875rem; }
+.start-biome-note > i { color: var(--color-foreground-subtle); flex: none; }
+.start-biome-attribution { font-size: .625rem; color: var(--color-foreground-subtle); }
+.start-biome-attribution > i { margin-right: .375rem; }
+.start-biome-actions { position: relative; }
+.start-biome-actions button { width: 100%; white-space: nowrap; }
+.start-biome-actions [data-start="find"]:disabled { visibility: hidden; }
+.start-biome-actions [data-start="cancel"] { position: absolute; inset: 0; }
+.start-biome-map-area { position: relative; container-type: size; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.start-biome-status { position: absolute; left: .75rem; right: .75rem; bottom: .5rem; font-size: .8125rem; text-align: center; }
+.start-biome-status:has(progress[hidden]) { visibility: hidden; }
+.start-biome-status progress { display: block; width: 100%; height: .375rem; accent-color: var(--color-primary); margin-bottom: .5rem; }
+.start-biome-footer { display: grid; align-items: center; min-width: 0; padding: .75rem 1rem; border: 1px solid var(--color-border); border-radius: .75rem; background: var(--color-surface-raised); transition: border-color 180ms ease, background-color 180ms ease; }
+.start-biome-dialog[data-state="found"] .start-biome-footer { border-color: color-mix(in srgb, var(--color-primary) 35%, var(--color-border)); background: color-mix(in srgb, var(--color-primary) 4%, var(--color-surface-raised)); }
+.start-biome-awaiting { display: flex; align-items: center; gap: .875rem; }
+.start-biome-awaiting > i { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; flex: none; border: 1px solid var(--color-border); border-radius: .75rem; background: var(--color-surface); color: var(--color-foreground-subtle); }
+.start-biome-awaiting strong { font-size: .8125rem; font-weight: 500; color: var(--color-foreground-muted); }
+.start-biome-awaiting p { margin-top: .25rem; color: var(--color-foreground-subtle); font-size: .75rem; }
+.start-biome-result { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 1rem; }
+.start-biome-seed-details { min-width: 0; }
+.start-biome-seed-label { display: flex; align-items: center; gap: .375rem; color: var(--color-primary); font-size: .6875rem; font-weight: 500; }
+.start-biome-copy-feedback { margin-left: auto; font-size: .625rem; }
+.start-biome-copy-feedback[data-state="error"] { color: #fca5a5; }
+.start-biome-seed-row { display: flex; align-items: center; gap: .375rem; margin: .125rem 0; }
+.start-biome-dialog .start-biome-copy { width: 1.875rem; height: 1.875rem; flex: none; padding: 0; border-color: transparent; background: transparent; color: var(--color-foreground-muted); font-size: .8125rem; }
+.start-biome-dialog .start-biome-copy:hover { background: var(--color-surface-hover); border-color: var(--color-border-strong); color: var(--color-foreground); }
+.start-biome-seed-row[data-copy-state="copied"] .start-biome-copy { color: var(--color-primary); background: color-mix(in srgb, var(--color-primary) 10%, transparent); }
+.start-biome-seed-row[data-copy-state="error"] .start-biome-copy { color: #fca5a5; }
+.start-biome-seed { display: block; width: 100%; min-width: 0; padding: .5rem .625rem; border: 1px solid var(--color-border-strong); border-radius: .5rem; background: var(--color-surface); color: var(--color-foreground); font-family: monospace; font-size: 1rem; font-weight: 600; letter-spacing: .025em; cursor: default; }
+.start-biome-seed:hover { border-color: var(--color-primary); }
+.start-biome-seed:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.start-biome-seed-row .start-biome-seed { margin: 0; transition: color 180ms ease; }
+.start-biome-result [data-start="open"] { white-space: nowrap; }
+.start-biome-preview { position: relative; aspect-ratio: 2 / 1; overflow: hidden; border: 1px solid var(--color-border-strong); border-radius: .75rem; background: #0d151d; }
+.start-biome-preview { flex: none; width: min(100%, 200cqh); }
+.start-biome-preview { box-shadow: 0 8px 24px #0003; }
+.start-biome-map-label { position: absolute; z-index: 1; top: .625rem; left: .625rem; display: flex; align-items: center; gap: .375rem; padding: .375rem .5rem; border: 1px solid #ffffff15; border-radius: .375rem; background: #0d151dd9; color: var(--color-foreground-muted); font-size: .625rem; pointer-events: none; }
+.start-biome-map-label > i { color: var(--color-primary); }
+.start-biome-preview[data-empty] { background-image: linear-gradient(rgb(5 10 15 / 88%), rgb(5 10 15 / 88%)), url('/images/map-placeholder.webp'); background-size: cover; background-position: center; }
+.start-biome-preview canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
+.start-biome-preview-status { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .75rem; padding: 1rem; text-align: center; font-size: .875rem; }
+.start-biome-preview-status > i { display: grid; place-items: center; width: 3rem; height: 3rem; border: 1px solid color-mix(in srgb, var(--color-primary) 25%, var(--color-border)); border-radius: 50%; background: color-mix(in srgb, var(--color-primary) 8%, var(--color-surface)); color: var(--color-primary); font-size: 1.125rem; }
+.start-biome-preview-status > span { max-width: 25rem; color: var(--color-foreground-muted); font-size: .8125rem; line-height: 1.6; }
+.start-biome-preview-status > span:empty { display: none; }
+.start-biome-dialog[data-state="error"] .start-biome-preview-status > i { color: #fca5a5; border-color: #fca5a540; }
+.start-biome-pin { position: absolute; transform: translate(-50%, -100%); line-height: 0; pointer-events: none; filter: drop-shadow(0 3px 3px #000c); }
+.start-biome-pin svg { display: block; fill: #f43f5e; stroke: #fff; stroke-width: 2; }
+.start-biome-attribution a { text-decoration: underline; text-underline-offset: 3px; }
+.start-biome-dialog [hidden] { display: none !important; }
+@media (min-width: 601px) and (max-width: 760px) {
+  .start-biome-dialog form { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .start-biome-actions { grid-column: 1 / -1; justify-self: end; width: 14rem; }
+}
+@media (max-width: 600px) {
+  .start-biome-dialog { padding: 1rem; }
+  .start-biome-dialog[open] { grid-template-rows: auto auto minmax(10rem, 1fr) auto auto; }
+  .start-biome-dialog form { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .start-biome-fields label:last-child { grid-column: 1 / -1; }
+  .start-biome-actions { grid-column: 1 / -1; }
+  .start-biome-footer { min-height: 8.5rem; }
+  .start-biome-result { grid-template-columns: minmax(0, 1fr); }
+  .start-biome-result [data-start="open"] { grid-column: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .start-biome-dialog :is(button, a) { transition: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .start-biome-dialog, .start-biome-dialog::backdrop { transition: none; }
+  .start-biome-dialog { transform: none; }
+  .start-biome-footer { transition: none; }
+  .start-biome-preview-status .fa-spin { animation: none; }
+  .start-biome-seed-row .start-biome-seed { transition: none; }
+  @starting-style { .start-biome-dialog[open] { transform: none; } }
+}
