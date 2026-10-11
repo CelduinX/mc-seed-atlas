@@ -1,0 +1,45 @@
+/*
+ * Seed Atlas — Dark Branding Theme
+ * Tailwind CSS v4
+ * Markenfarben: Hex-Werte aus dem Brand-Konzept.
+ * Dunkle UI-Farben: aus der Vorlage abgeleitet (Näherungswerte).
+ *
+ * Einbindung in app.css:
+ *   @import "tailwindcss";
+ *   @import "./theme.css";
+ */
+
+@theme {
+  /* Markenfarben */
+  --color-waldgruen: #22c55e;
+  --color-moosgruen: #16a34a;
+  --color-flussblau: #3b82f6;
+  --color-sandbeige: #f4d28b;
+  --color-steingrau: #e5e7eb;
+
+  /* Dunkle Hintergründe — Seed Atlas Dark Mode */
+  --color-background: #0d1115;         /* Seitenhintergrund */
+  --color-background-deep: #0b0f13;    /* Tieferer Kontrast / Vignette */
+  --color-surface: #101419;            /* Cards und Panels */
+  --color-surface-alt: #11161b;        /* Abgesetzte Flächen */
+  --color-surface-raised: #171e25;     /* Navigation, erhöhte Elemente */
+  --color-surface-hover: #1c242c;      /* Hover / Eingabefelder */
+
+  /* Rahmen und Trennlinien */
+  --color-border: #2a333d;
+  --color-border-strong: #37414d;
+
+  /* Typografie */
+  --color-foreground: #f5f7fb;
+  --color-foreground-muted: #a7adba;
+  --color-header-foreground: #cbd2dc;
+  --color-foreground-subtle: #7f8896;
+}
+
+/* Semantische Aliase: Markenfarben bleiben an einer Stelle pflegbar. */
+@theme inline {
+  --color-primary: var(--color-waldgruen);
+  --color-primary-hover: var(--color-moosgruen);
+  --color-secondary: var(--color-flussblau);
+  --color-accent: var(--color-sandbeige);
+}

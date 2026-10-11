@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Seed Atlas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  </head>
+  <body>
+    <div id="app" class="flex min-h-screen flex-col">
+      <header class="shrink-0 border-b border-border bg-surface-raised shadow-sm">
+        <div class="page-container header-layout" data-compact>
+          <a href="/" class="header-brand flex min-w-0 items-center gap-2 rounded-md py-3 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary sm:gap-3" aria-label="Seed Atlas">
+            <img src="/images/logo-square.webp" alt="" width="56" height="56" class="size-14 shrink-0 object-contain" />
+            <span class="flex min-w-0 flex-col justify-center gap-0">
+              <span class="whitespace-nowrap text-xl leading-[1.1] font-semibold tracking-tight sm:text-2xl"><span class="text-primary">Seed</span> <span class="text-foreground">Atlas</span></span>
+              <span class="text-xs leading-4 font-normal text-header-foreground sm:text-sm sm:leading-5" data-i18n="tagline">Finde deinen Minecraft Seed</span>
+            </span>
+          </a>
+          <button id="navigation-toggle" class="navigation-toggle" type="button" aria-controls="header-navigation" aria-expanded="false" aria-label="Menü öffnen oder schließen" data-i18n-aria-label="toggleNavigation">
+            <span class="hamburger-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+          </button>
+          <nav id="header-navigation" class="header-navigation" aria-label="Hauptnavigation" data-i18n-aria-label="mainNavigation" hidden>
+            <a href="#" class="navigation-link">
+              <i class="fa-solid fa-house" aria-hidden="true"></i>
+              <span data-i18n="home">Startseite</span>
+            </a>
+            <a href="#" class="navigation-link">
+              <i class="fa-solid fa-leaf" aria-hidden="true"></i>
+              <span data-i18n="biomeFinder">Biom Finder</span>
+            </a>
+            <a href="#" class="navigation-link">
+              <i class="fa-solid fa-building" aria-hidden="true"></i>
+              <span data-i18n="structureFinder">Struktur Finder</span>
+            </a>
+            <a href="#" class="navigation-link">
+              <i class="fa-solid fa-hammer" aria-hidden="true"></i>
+              <span data-i18n="seedCrafter">Seed Crafter</span>
+            </a>
+            <a href="#/seed-explorer" class="navigation-link">
+              <i class="fa-solid fa-map" aria-hidden="true"></i>
+              <span data-i18n="seedExplorer">Seed Explorer</span>
+            </a>
+          </nav>
+        </div>
+      </header>
+      <main class="page-content flex-1">
+        <div class="page-container"></div>
+      </main>
+      <footer class="site-footer shrink-0 border-t border-border bg-surface-raised text-sm leading-5 text-foreground-muted">
+        <div class="page-container footer-layout">
+          <div class="footer-brand">
+            <span class="font-medium"><span class="text-primary">Seed</span> <span class="text-foreground">Atlas</span></span>
+            <span class="border-l border-border pl-3 text-foreground-muted tabular-nums">Version 1.0.0</span>
+          </div>
+          <span class="footer-copyright">&copy; 2026 <span class="font-medium text-foreground">CelduinX</span></span>
+          <div class="footer-actions">
+            <div class="footer-legal">
+              <a href="#" class="footer-link" data-i18n="legalNotice">Impressum</a>
+              <a href="#" class="footer-link" data-i18n="privacyPolicy">Datenschutz</a>
+              <a href="#" class="footer-link" data-i18n="cookieSettings">Cookies</a>
+            </div>
+            <details id="language-picker" class="language-picker">
+              <summary class="language-trigger" aria-label="Sprache ausw&#228;hlen">
+                <img id="language-flag" class="language-flag" src="/flags/de.svg" alt="" width="20" height="14" />
+              </summary>
+              <fieldset class="language-panel">
+                <legend class="sr-only" data-i18n="languageLabel">Sprache ausw&#228;hlen</legend>
+                <label class="language-option">
+                  <input type="radio" name="language" value="de" />
+                  <img class="language-flag" src="/flags/de.svg" alt="" width="20" height="14" />
+                  <span class="sr-only">Deutsch</span>
+                </label>
+                <label class="language-option">
+                  <input type="radio" name="language" value="en" />
+                  <img class="language-flag" src="/flags/gb.svg" alt="" width="20" height="14" />
+                  <span class="sr-only">English</span>
+                </label>
+              </fieldset>
+            </details>
+          </div>
+        </div>
+      </footer>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
