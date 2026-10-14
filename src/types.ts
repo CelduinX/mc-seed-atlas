@@ -1,4 +1,5 @@
-export type Version = '26.1' | '26.1.1' | '26.1.2' | '26.2' | '26.3';
+import type { Version } from './versions.ts';
+export type { Version } from './versions.ts';
 export type BiomeSize = 'small' | 'medium' | 'large';
 export type Language = 'de' | 'en';
 export type LanguagePreference = Language | 'auto';

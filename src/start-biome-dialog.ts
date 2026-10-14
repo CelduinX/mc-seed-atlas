@@ -2,9 +2,9 @@ import type { BiomeCard, SearchResult, SearchRequest, SearchResponse, WorkerPort
 import { createWorker } from './wasm-adapter.ts';
 import { query, canvasContext, closest, translated } from './dom.ts';
 import './start-biome-dialog.css';
-import { VERSIONS, requireVersion } from './explorer-core.ts';
+import { VERSIONS, requireVersion, isVersion } from './explorer-core.ts';
 import { colourize } from './biome-palette.ts';
-import { requireBiomeSize, BIOME_SIZES, biomeSizeRadius, explorerLink } from './start-biome-core.ts';
+import { requireBiomeSize, BIOME_SIZES, biomeSizeRadius, explorerLink, startBiomeAvailable } from './start-biome-core.ts';
 
 const copy = {
   de: { empty: 'Wähle deine Welteinstellungen und klicke auf „Seed finden“.', heading: 'DEIN STARTBIOM', mapTitle: 'Spawn-Vorschau', seedLabel: 'Dein Minecraft-Seed', awaiting: 'Dein Seed erscheint hier', awaitingHint: 'Wähle deine Einstellungen und starte die Suche.', copySeed: 'Seed kopieren', copied: 'Kopiert', copyError: 'Fehlgeschlagen', copyErrorHint: 'Kopieren fehlgeschlagen. Bitte den Seed markieren und manuell kopieren.', size: 'Biomgröße', small: 'Klein', medium: 'Mittel', largeSize: 'Groß', version: 'Minecraft Java Version', world: 'Weltvariante', standard: 'Standard', large: 'Große Biome', find: 'Seed finden', again: 'Weiteren Seed finden', cancel: 'Abbrechen', close: 'Schließen', open: 'Im Seed Explorer öffnen', note: 'Spawn geschätzt; kann vom Minecraft-Weltspawn abweichen.', slice: 'Biomprüfung und Vorschau bei Y=64.', loading: 'Biomgenerator wird geladen …', searching: 'Suche läuft · Geprüfte Seeds:', found: 'Passender Seed gefunden', stopped: 'Suche abgebrochen.', error: 'Die Seed-Suche ist fehlgeschlagen. Bitte erneut versuchen.', preview: 'Kartenvorschau wird berechnet …', previewError: 'Die Kartenvorschau konnte nicht geladen werden.', retry: 'Vorschau erneut laden', map: 'Kartenvorschau mit geschätztem Weltspawn', spawn: 'Geschätzter Weltspawn' },
@@ -18,7 +18,7 @@ export function createStartBiomeDialog(root: HTMLElement, biomes: BiomeCard[]) {
   const dialog = document.createElement('dialog');
   dialog.className = 'start-biome-dialog'; dialog.setAttribute('aria-labelledby', 'start-biome-title');
   dialog.innerHTML = `<header><div><p class="start-biome-eyebrow" data-copy="heading"></p><h2 id="start-biome-title"><i aria-hidden="true"></i><span></span></h2></div><button type="button" data-start="close">${fa('xmark')}</button></header>
-    <form><div class="start-biome-fields"><label><span class="start-biome-field-label">${fa('cube')}<span data-copy="version"></span></span><span class="start-biome-select"><select name="version">${[...VERSIONS].reverse().map(v => `<option>${v}</option>`).join('')}</select>${fa('chevron-down')}</span></label><label><span class="start-biome-field-label">${fa('sliders')}<span data-copy="world"></span></span><span class="start-biome-select"><select name="world"><option value="standard" data-copy="standard"></option><option value="large" data-copy="large"></option></select>${fa('chevron-down')}</span></label><label><span class="start-biome-field-label">${fa('expand')}<span data-copy="size"></span></span><span class="start-biome-select"><select name="biomeSize">${Object.keys(BIOME_SIZES).map(size => `<option value="${size}" ${size === 'medium' ? 'selected' : ''} data-copy="${size === 'large' ? 'largeSize' : size}"></option>`).join('')}</select>${fa('chevron-down')}</span></label></div>
+    <form><div class="start-biome-fields"><label><span class="start-biome-field-label">${fa('cube')}<span data-copy="version"></span></span><span class="start-biome-select"><select name="version">${[...VERSIONS].reverse().map(v => `<option value="${v}">${v}</option>`).join('')}</select>${fa('chevron-down')}</span></label><label><span class="start-biome-field-label">${fa('sliders')}<span data-copy="world"></span></span><span class="start-biome-select"><select name="world"><option value="standard" data-copy="standard"></option><option value="large" data-copy="large"></option></select>${fa('chevron-down')}</span></label><label><span class="start-biome-field-label">${fa('expand')}<span data-copy="size"></span></span><span class="start-biome-select"><select name="biomeSize">${Object.keys(BIOME_SIZES).map(size => `<option value="${size}" ${size === 'medium' ? 'selected' : ''} data-copy="${size === 'large' ? 'largeSize' : size}"></option>`).join('')}</select>${fa('chevron-down')}</span></label></div>
     <div class="start-biome-actions"><button type="submit" class="start-biome-primary" data-start="find">${fa('magnifying-glass')}<span></span></button><button type="button" data-start="cancel" hidden>${fa('stop')}<span data-copy="cancel"></span></button></div>
     </form>
     <div class="start-biome-map-area">
@@ -44,6 +44,14 @@ export function createStartBiomeDialog(root: HTMLElement, biomes: BiomeCard[]) {
   const language = () => document.documentElement.lang === 'de' ? 'de' : 'en';
   const t = (key: keyof typeof copy.en) => copy[language()][key];
   function refresh() {
+    const versionSelect = query(form, '[name="version"]', 'select');
+    const previousVersion = versionSelect.value;
+    const availableVersions = [...VERSIONS].reverse().filter(version => startBiomeAvailable(biomes[selected]!.id, version));
+    versionSelect.replaceChildren(...availableVersions.map(version => {
+      const option = document.createElement('option'); option.value = version; option.textContent = version; return option;
+    }));
+    versionSelect.value = availableVersions.some(version => version === previousVersion) ? previousVersion : availableVersions.at(-1)!;
+    versionSelect.title = language() === 'de' ? 'Nur Versionen, in denen dieses Biom vorkommt, werden angezeigt.' : 'Only versions containing this biome are shown.';
     dialog.querySelectorAll<HTMLElement>('[data-copy]').forEach(el => { el.textContent = translated(copy[language()], el.dataset.copy); });
     const largeWorld = query(form, '[name="world"]', 'select').value === 'large';
     for (const option of query(form, '[name="biomeSize"]', 'select').options) {
@@ -115,6 +123,8 @@ export function createStartBiomeDialog(root: HTMLElement, biomes: BiomeCard[]) {
   function close() { stop(); resetCopy(); if (dialog.open) dialog.close(); if (!disposed && trigger?.isConnected) trigger.focus(); }
   function start(event?: Event) {
     event?.preventDefault();
+    const version = query(form, '[name="version"]', 'select').value;
+    if (!isVersion(version) || !startBiomeAvailable(biomes[selected]!.id, version)) { refresh(); return; }
     if (state === 'loading' || state === 'searching') return;
     stop(); clearResult(); attempts = 0; state = 'loading'; refresh();
     const id = serial;

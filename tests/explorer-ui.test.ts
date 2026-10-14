@@ -191,11 +191,11 @@ test('technical DOM/canvas integration: workers, navigation, translation, reload
     window.location.hash = '';
     await wait(() => !q('.explorer')!);
     assert(q('[data-page="home"]')!);
-    assert.equal(q('[data-page="home"]')!.childNodes.length, 0);
+    assert(q('[data-page="home"]')!.querySelector('.wip-notice'));
     assert.equal(q('a[href="#/home"]', 'a')!.getAttribute('aria-current'), 'page');
     window.location.hash = '#/seed-crafter';
     await wait(() => q('[data-page="seed-crafter"]')!);
-    assert.equal(q('[data-page="seed-crafter"]')!.childNodes.length, 0);
+    assert(q('[data-page="seed-crafter"]')!.querySelector('.wip-notice'));
     assert.equal(q('a[href="#/seed-crafter"]', 'a')!.getAttribute('aria-current'), 'page');
     assert.equal(liveWorkers.size, 0);
     mkdirSync('.cache', { recursive: true });

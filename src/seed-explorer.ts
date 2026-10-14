@@ -3,6 +3,7 @@ import { createWorker } from './wasm-adapter.ts';
 import { query, canvasContext, closest, translated } from './dom.ts';
 import './seed-explorer.css';
 import { requireVersion, VERSIONS, LIMIT, TILE, parseSeed, randomSeed, sampling, clampView, worldAt, zoomAt, visibleTiles, tileKey, TileCache } from './explorer-core.ts';
+import { biomeAvailable } from './versions.ts';
 import { BIOMES, biomeName, colourize } from './biome-palette.ts';
 import { ExplorerPool } from './explorer-pool.ts';
 import { icon } from './explorer-icons.ts';
@@ -62,7 +63,7 @@ export function createSeedExplorer(container: HTMLElement, { initialConfig, inva
     root.querySelectorAll<HTMLElement>('[data-explorer-text]').forEach(el => { el.textContent = translated(copy[language], el.dataset.explorerText); });
     root.querySelectorAll<HTMLElement>('[data-explorer-label]').forEach(el => { el.setAttribute('aria-label', translated(copy[language], el.dataset.explorerLabel)); if (el.matches('button')) el.title = translated(copy[language], el.dataset.explorerLabel); });
     const list = query(root, '.explorer-legend div');
-    list.replaceChildren(...[...BIOMES.values()].filter(b => !config || config.version === '26.3' || b.id !== 188).filter(b => !config || !config.version.startsWith('26.1') || b.id !== 187).map(b => {
+    list.replaceChildren(...[...BIOMES.values()].filter(b => !config || biomeAvailable(b.id, config.version)).map(b => {
       const item = document.createElement('span'); const swatch = document.createElement('i'); swatch.style.background = b.color; item.append(swatch, b[language]); return item;
     }));
     if (!query(root, '#seed-error').hidden) query(root, '#seed-error').textContent = configurationError ? (language === 'de' ? 'Die übergebenen Welteinstellungen sind ungültig. Bitte Seed, Version und Weltvariante prüfen.' : 'The supplied world settings are invalid. Please check the seed, version and world type.') : t('seedError');

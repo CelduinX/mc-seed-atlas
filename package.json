@@ -1,9 +1,10 @@
 {
   "name": "seed-atlas-v2",
-  "version": "0.1.0",
+  "version": "1.0.1",
   "private": true,
   "type": "module",
   "scripts": {
+    "prebuild:wasm": "node scripts/create-version-header.ts",
     "build:wasm": "docker build -f wasm/Dockerfile --output type=local,dest=public/wasm .",
     "test": "npm run typecheck && node --import ./tests/setup.ts --test tests/*.test.ts",
     "test:vanilla": "node scripts/create-samples.ts && powershell -ExecutionPolicy Bypass -File scripts/validate-vanilla.ps1",

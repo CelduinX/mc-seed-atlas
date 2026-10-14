@@ -8,7 +8,8 @@ import { BIOMES } from '../src/biome-palette.ts';
 
 test('WASM spawn estimates match independent native Cubiomes for every release and world type', async () => {
   const fixtures = samples(JSON.parse(readFileSync(new URL('./spawn-fixtures.json', import.meta.url), 'utf8')) as unknown);
-  const engine = await loadEngine('biomes'); assert.equal(fixtures.length, 50);
+  const engine = await loadEngine('biomes'); assert.equal(fixtures.length, VERSIONS.length * 10);
+  for (const version of VERSIONS) for (const large of [0, 1]) assert.equal(fixtures.filter(sample => sample.version === version && sample.large === large).length, 5);
   for (const sample of fixtures) {
     engine._atlas_init(VERSIONS.indexOf(sample.version), sample.large, ...seedWords(sample.seed));
     const pointer = engine._atlas_spawn();
@@ -19,7 +20,9 @@ test('WASM spawn estimates match independent native Cubiomes for every release a
 test('all pinned release and world-type fixtures match independent Vanilla Java results', async () => {
   const fixtures = object(JSON.parse(readFileSync(new URL('./vanilla-fixtures.json', import.meta.url), 'utf8')) as unknown);
   const engine = await loadEngine('biomes'); let previous = '';
-  for (const sample of samples(fixtures.samples)) {
+  const referenceSamples = samples(fixtures.samples);
+  for (const version of VERSIONS) for (const large of [0, 1]) assert(referenceSamples.some(sample => sample.version === version && sample.large === large), `Missing Vanilla coverage: ${version}, ${large}`);
+  for (const sample of referenceSamples) {
     const key = `${sample.version}:${sample.seed}:${sample.large}`;
     if (key !== previous) { assert.equal(engine._atlas_init(VERSIONS.indexOf(sample.version), sample.large, ...seedWords(sample.seed)), 0); previous = key; }
     const id = engine._atlas_point(sample.x, sample.z);

@@ -2,7 +2,7 @@ import type { BiomeEngine, Position, BiomeSize, WorldSettings, SearchResult, Sea
 import { loadEngine, workerScope } from './wasm-adapter.ts';
 const scope = workerScope<SearchRequest, SearchResponse>();
 import { randomSeed, seedWords, VERSIONS } from './explorer-core.ts';
-import { START_BIOME_IDS, BIOME_SIZES, MIN_BIOME_SHARE, biomeSizeRadius } from './start-biome-core.ts';
+import { startBiomeAvailable, BIOME_SIZES, MIN_BIOME_SHARE, biomeSizeRadius } from './start-biome-core.ts';
 
 let engine: BiomeEngine | undefined, result: SearchResult | undefined;
 async function load() {
@@ -24,7 +24,7 @@ export function biomeSizeMatches(engine: Pick<BiomeEngine, '_atlas_point'>, spaw
   return matching / total >= MIN_BIOME_SHARE;
 }
 export async function findSeed(engine: BiomeEngine, config: WorldSettings, biome: number, { start = randomSeed(), excluded = [], progress = () => {}, size = null }: { start?: string; excluded?: string[]; progress?: (attempts: number) => void; size?: BiomeSize | null } = {}): Promise<SearchResult> {
-  if (!VERSIONS.includes(config.version) || typeof config.large !== 'boolean' || !START_BIOME_IDS.includes(biome)) throw new Error('Unsupported configuration');
+  if (!VERSIONS.includes(config.version) || typeof config.large !== 'boolean' || !startBiomeAvailable(biome, config.version)) throw new Error('Unsupported configuration');
   if (size !== null && !Object.hasOwn(BIOME_SIZES, size)) throw new Error('Unsupported biome size');
   let candidate = BigInt(start), attempts = 0, last = performance.now();
   const skip = new Set(excluded);

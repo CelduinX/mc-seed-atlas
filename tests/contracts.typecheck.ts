@@ -8,7 +8,7 @@ export function checkContracts(map: WorkerPort<MapRequest, MapResponse>, search:
   search.postMessage({ type: 'search', id: 2, config: { version, large: true }, biome: 4, excluded: [], size });
   exportWorker.postMessage({ type: 'export', id: 3, generation: 1, config: { seed: '0', version, large: false }, region: { x: 0, z: 0, width: 128, height: 128, scale: 4 } });
   // @ts-expect-error Unsupported release.
-  const invalidVersion: Version = '1.21';
+  const invalidVersion: Version = '1.18.1';
   // @ts-expect-error Unsupported biome size.
   const invalidSize: BiomeSize = 'huge';
   // @ts-expect-error Init requires a complete world configuration.

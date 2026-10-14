@@ -17,6 +17,8 @@ export function resolveLanguage(preference: LanguagePreference, languages: reado
 export const translations = {
   de: {
     home: 'Startseite',
+    wipTitle: 'Hier entsteht etwas Neues',
+    wipDescription: 'Dieser Bereich befindet sich noch in Entwicklung. Schau bald wieder vorbei!',
     mainNavigation: 'Hauptnavigation',
     toggleNavigation: 'Menü öffnen oder schließen',
     biomeFinder: 'Startbiom',
@@ -31,6 +33,8 @@ export const translations = {
   },
   en: {
     home: 'Home',
+    wipTitle: 'Something new is taking shape',
+    wipDescription: 'This section is still a work in progress. Check back soon!',
     mainNavigation: 'Main navigation',
     toggleNavigation: 'Open or close menu',
     biomeFinder: 'Starting Biome',

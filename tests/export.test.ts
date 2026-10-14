@@ -8,7 +8,7 @@ import { exportRegion, exportFilename } from '../src/explorer-export-core.ts';
 import { runExport, selectSmallest } from '../src/export-worker.ts';
 import { loadEngine } from '../src/wasm-adapter.ts';
 import { BIOMES } from '../src/biome-palette.ts';
-import { seedWords } from '../src/explorer-core.ts';
+import { seedWords, VERSIONS } from '../src/explorer-core.ts';
 
 const config: WorldConfig = { seed: '-123456789', version: '26.3', large: false };
 test('export regions use world-aligned grids, bounds and original sample resolution', () => {
@@ -26,7 +26,7 @@ test('export regions use world-aligned grids, bounds and original sample resolut
 });
 
 test('optimized visible-area dimensions and colours match exact biome samples at all scales', async () => {
-  const engine = await loadEngine('biomes'); engine._atlas_init(4, 0, ...seedWords(config.seed));
+  const engine = await loadEngine('biomes'); engine._atlas_init(VERSIONS.indexOf(config.version), 0, ...seedWords(config.seed));
   for (const scale of [1, 4, 16, 64] as const) {
     const region = { x: -129, z: -67, width: 137, height: 131, scale };
     const messages: ExportResponse[] = [];

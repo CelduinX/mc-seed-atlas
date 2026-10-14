@@ -1,5 +1,6 @@
 #include "generator.h"
 #include "finders.h"
+#include "versions.h"
 #include <stdlib.h>
 #include <stdint.h>
 
@@ -8,9 +9,8 @@ static int *buffer;
 static size_t capacity;
 
 int atlas_init(int version, int large, uint32_t low, uint32_t high) {
-    const int versions[] = {MC_26_1, MC_26_1_1, MC_26_1_2, MC_26_2, MC_26_3};
-    if (version < 0 || version > 4 || (large != 0 && large != 1)) return -1;
-    setupGenerator(&generator, versions[version], large ? LARGE_BIOMES : 0);
+    if (version < 0 || (size_t)version >= ATLAS_VERSION_COUNT || (large != 0 && large != 1)) return -1;
+    setupGenerator(&generator, atlas_versions[version], large ? LARGE_BIOMES : 0);
     applySeed(&generator, DIM_OVERWORLD, ((uint64_t)high << 32) | low);
     return 0;
 }

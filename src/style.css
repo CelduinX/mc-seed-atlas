@@ -7,6 +7,21 @@
 }
 
 @layer components {
+  .wip-page {
+    @apply grid min-h-[50vh] place-items-center py-16;
+  }
+  .wip-notice {
+    @apply w-full max-w-lg rounded-2xl border border-border bg-surface/90 px-6 py-10 text-center sm:px-10;
+  }
+  .wip-badge {
+    @apply inline-flex rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-semibold tracking-widest text-accent;
+  }
+  .wip-notice h1 {
+    @apply mt-5 text-2xl font-semibold text-foreground sm:text-3xl;
+  }
+  .wip-notice p {
+    @apply mt-3 text-sm leading-relaxed text-foreground-muted;
+  }
   .page-content {
     position: relative;
     isolation: isolate;

@@ -13,7 +13,9 @@ test('64-bit seeds remain exact and invalid inputs are rejected', () => {
   for (let i = 0; i < 100; i++) { const seed = randomSeed(); assert.equal(parseSeed(seed), seed); }
   assert.equal(randomSeed({ getRandomValues: values => { values.fill(0); return values; } }), '0');
   assert.equal(randomSeed({ getRandomValues: values => { values.fill(0xffffffff); return values; } }), '-1');
-  assert.deepEqual(VERSIONS, ['26.1', '26.1.1', '26.1.2', '26.2', '26.3']);
+  assert.equal(VERSIONS.length, 30);
+  assert.equal(VERSIONS[0], '1.18.2');
+  assert.equal(VERSIONS.at(-1), '26.3');
 });
 
 test('zoom preserves pointer anchor and all movement respects bounds', () => {

@@ -31,8 +31,19 @@ function renderPage() {
   if (container && ['#/home', '#/seed-crafter'].includes(route.path)) {
     const page = document.createElement('section');
     page.dataset.page = route.path.slice(2);
+    page.className = 'wip-page';
     page.dataset.i18nAriaLabel = route.path === '#/home' ? 'home' : 'seedCrafter';
     page.setAttribute('aria-label', translated(translations[document.documentElement.lang === 'de' ? 'de' : 'en'], page.dataset.i18nAriaLabel));
+    page.innerHTML = `
+      <div class="wip-notice">
+        <span class="wip-badge">WIP</span>
+        <h1 data-i18n="wipTitle"></h1>
+        <p data-i18n="wipDescription"></p>
+      </div>
+    `;
+    page.querySelectorAll<HTMLElement>('[data-i18n]').forEach(element => {
+      element.textContent = translated(translations[document.documentElement.lang === 'de' ? 'de' : 'en'], element.dataset.i18n);
+    });
     container.append(page);
   }
   if (container && route.path === '#/seed-explorer') seedExplorer = createSeedExplorer(container, { initialConfig: route.config, invalidConfig: route.error });

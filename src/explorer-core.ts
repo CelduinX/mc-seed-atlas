@@ -1,5 +1,6 @@
 import type { WorldConfig, View, Scale, Tile, Version } from './types.ts';
-export const VERSIONS = ['26.1', '26.1.1', '26.1.2', '26.2', '26.3'] as const;
+import { VERSIONS } from './versions.ts';
+export { VERSIONS } from './versions.ts';
 export const LIMIT = 10000;
 export const TILE = 128;
 export function parseSeed(value: unknown) {

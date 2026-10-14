@@ -1,20 +1,24 @@
 # Seed Explorer — technische Validierung
 
-Stand: 11.10.2026. Keine Website geöffnet, keine optische Kontrolle und keine Screenshots. Die optische Abnahme übernimmt der Nutzer.
+Stand: 14.10.2026. Keine Website geöffnet, keine optische Kontrolle und keine Screenshots. Die optische Abnahme übernimmt der Nutzer.
 
 ## Generierungsgenauigkeit
 
-Unveränderte offizielle Minecraft Java Release-Serverdateien wurden über das Mojang-Versionsmanifest geladen und deren SHA1 geprüft. `scripts/VanillaOracle.java` initialisiert Vanilla-Registries, den Noise-Generator für Standard beziehungsweise Große Biome und den BiomeManager mit seiner blockgenauen Voronoi-Auswahl bei Y=64. Dieser Referenzpfad verwendet weder Cubiomes noch dessen Tabellen.
+Unveränderte offizielle Minecraft Java Release-Serverdateien wurden über das Mojang-Versionsmanifest geladen und deren SHA1 geprüft. Bei obfuskierten Releases werden zusätzlich die offiziellen, SHA1-geprüften Server-Mappings für den reflektiven Zugriff verwendet; die JAR-Dateien werden nicht umgeschrieben. `scripts/VanillaOracle.java` initialisiert Vanilla-Registries, den Noise-Generator für Standard beziehungsweise Große Biome und den BiomeManager mit seiner blockgenauen Voronoi-Auswahl bei Y=64. Dieser Referenzpfad verwendet weder Cubiomes noch dessen Tabellen.
 
 | Release | Standard + Große Biome | Abweichungen |
 | --- | ---: | ---: |
-| 26.1 | 29.472 Abfragen | 0 |
-| 26.1.1 | 29.472 Abfragen | 0 |
-| 26.1.2 | 29.472 Abfragen | 0 |
-| 26.2 | 29.472 Abfragen | 0 |
-| 26.3 | 29.472 Abfragen | 0 |
+| 1.18.2 | 29.472 Abfragen | 0 |
+| 1.19, 1.19.1, 1.19.2, 1.19.3, 1.19.4 | 147.360 Abfragen | 0 |
+| 1.20 und 1.20.1–1.20.6 | 206.304 Abfragen | 0 |
+| 1.21 und 1.21.1–1.21.11 | 353.664 Abfragen | 0 |
+| 26.1, 26.1.1, 26.1.2, 26.2, 26.3 | 147.360 Abfragen | 0 |
 
-Insgesamt **147.360 übereinstimmende Abfragen**. Seeds: 0, 123456789, −123456789, 9223372036854775807, −9223372036854775808 und 3000000007807634720. Pro Seed/Welttyp 400 deterministisch verteilte Punkte, Grenz-/Ursprungspunkte und zwei dichte Linien über negative und positive Kachelgrenzen. Dies ist eine umfangreiche Stichprobe, kein Beweis für jede mögliche Weltkoordinate.
+Insgesamt **884.160 übereinstimmende unabhängige Punktabfragen**, 29.472 pro Release. Seeds: 0, 123456789, −123456789, 9223372036854775807, −9223372036854775808 und 3000000007807634720. Pro Seed/Welttyp 400 deterministisch verteilte Punkte, Grenz-/Ursprungspunkte und zwei dichte Linien über negative und positive Kachelgrenzen. Dies ist eine umfangreiche Stichprobe, kein Beweis für jede mögliche Weltkoordinate.
+
+**Historische Einschränkung:** Vor 1.19.3 kann der Vanilla-RTree bei gleichwertigen Biomkandidaten den vorherigen Suchtreffer bevorzugen (MC-241546). Für unabhängige, reproduzierbare Punktabfragen leert der Oracle vor jedem Zugriff diesen ThreadLocal-Suchcache. Die Anwendung liefert ebenfalls eine von der Abfragereihenfolge unabhängige Detailkarte. Mit beibehaltenem Vanilla-Cache wurden in 1.19.2 beim Seed 9223372036854775807, Standardwelt, Z=−129, X=498–500 drei Abweichungen beobachtet: Vanilla mit Suchhistorie Tiefsee, unabhängige Abfrage und Atlas kalte Tiefsee. Bereits generierte Spielwelten können daher an einzelnen historischen Biomgrenzen abweichen. Der Cache-Vergleich lässt sich mit der Umgebungsvariable `ATLAS_VANILLA_KEEP_CACHE=1` und `scripts/validate-vanilla.ps1 -Versions 1.19.2` wiederholen; dieser Lauf schlägt erwartungsgemäß beim Vergleich fehl.
+
+Versionsdefinitionen und Generatorfamilien stehen zentral in `src/versions.ts`. `scripts/create-version-header.ts` erzeugt daraus `wasm/versions.h`; `npm run build:wasm` führt dies automatisch aus. Startbiome und Kartenlegende berücksichtigen die Einführung von Mangrovensumpf/Tiefem Dunkel (1.19), Kirschhain (1.20), Blassem Garten (1.21.4), Schwefelhöhlen (26.2) und Gesprenkeltem Wald (26.3). Unmögliche Startbiom-Suchen werden sowohl im Dialog als auch im Worker verhindert.
 
 Die wiederholbaren Tests vergleichen zusätzlich Blockkacheln mit Einzelabfragen über negative Kachelgrenzen für sämtliche Versionen/Welttypen und führen alle Samplingstufen aus. Ein Auszug der unabhängigen Vanilla-Ergebnisse liegt in `tests/vanilla-fixtures.json`.
 
@@ -32,11 +36,11 @@ Technischer Integrationstest auf AMD Ryzen 7 7800X3D (8 Kerne/16 logische Prozes
 
 Diese Messung prüft den tatsächlich implementierten Zeichen-/Kachelpfad ohne Browser. Browser-Compositing, reale Touch-Hardware und mobile Laufzeiten wurden nicht gemessen. Laufzeiten können mit CPU-Auslastung variieren; unter gleichzeitiger Export-/Buildlast trat in einem separaten Lauf ein Zeichenmaximum von 17,6 ms auf. Der Regressionstest prüft den Zwei-Sekunden-Grenzwert für die Übersichtskacheln und 16 ms im 95. Perzentil für Hauptthread-Aufgaben. Rohdaten: `.cache/ui-performance.json`.
 
-Geprüfte Abläufe: Seedfehler, Zufallsseed, 64-Bit-Grenzseed, Mausposition/Biomabfrage, Tastaturzoom, Mausrad, Zwei-Finger-Pinch, Koordinatengrenzen und feldbezogene Fehler, Sprachwechsel ohne Seedverlust, schnelle Versionswechsel, Worker-Bereinigung, HTML-Hot-Update, simulierter WASM-Ladefehler und erfolgreiche Wiederholung. Zusätzlich: Platzhalter bleibt bis zur vollständigen Freigabe stehen; alle 16 Übersichtskacheln und Spawn liegen dann vor; Fortschritt innerhalb der Kartenbox; Download gesperrt bis zur Freigabe; Exportdialog, echter Bilddownload, Abbruch, veraltete Exportantworten und Wiederholung nach simuliertem Exportfehler. `npm test`: **15 Tests bestanden**.
+Geprüfte Abläufe: Seedfehler, Zufallsseed, 64-Bit-Grenzseed, Mausposition/Biomabfrage, Tastaturzoom, Mausrad, Zwei-Finger-Pinch, Koordinatengrenzen und feldbezogene Fehler, Sprachwechsel ohne Seedverlust, schnelle Versionswechsel, Worker-Bereinigung, HTML-Hot-Update, simulierter WASM-Ladefehler und erfolgreiche Wiederholung. Zusätzlich: Platzhalter bleibt bis zur vollständigen Freigabe stehen; alle 16 Übersichtskacheln und Spawn liegen dann vor; Fortschritt innerhalb der Kartenbox; Download gesperrt bis zur Freigabe; Exportdialog, echter Bilddownload, Abbruch, veraltete Exportantworten und Wiederholung nach simuliertem Exportfehler. `npm test`: **27 Tests bestanden**.
 
 ## Geschätzter Weltspawn
 
-`wasm/spawn-reference.c` ruft den gepinnten, gepatchten Cubiomes-Estimator unabhängig mit nativem GCC auf. 50 Referenzen für alle fünf Releases, beide Welttypen und Seeds 0, 123456789, −123456789 sowie beide 64-Bit-Grenzwerte stimmen mit der WASM-Ausgabe überein. Wiederholbar mit `powershell -ExecutionPolicy Bypass -File scripts/validate-spawn.ps1`; Fixtures: `tests/spawn-fixtures.json`.
+`wasm/spawn-reference.c` ruft den gepinnten, gepatchten Cubiomes-Estimator unabhängig mit nativem GCC auf. 300 Referenzen für alle 30 Releases, beide Welttypen und Seeds 0, 123456789, −123456789 sowie beide 64-Bit-Grenzwerte stimmen mit der WASM-Ausgabe überein. Wiederholbar mit `powershell -ExecutionPolicy Bypass -File scripts/validate-spawn.ps1`; Fixtures: `tests/spawn-fixtures.json`.
 
 Dies validiert ausschließlich die Cubiomes-Schätzung. Minecraft berücksichtigt zusätzlich Gelände und Blöcke; eine Übereinstimmung mit dem tatsächlichen Vanilla-Weltspawn wird nicht behauptet. Die Oberfläche kennzeichnet diese Einschränkung. Der Pin ist an seiner Spitze verankert, bleibt 36×44 CSS-Pixel groß und fällt nach Freigabe einmalig 600 ms animiert; bei reduzierter Bewegung erscheint er unmittelbar. Die optische Wirkung wurde nicht geprüft.
 

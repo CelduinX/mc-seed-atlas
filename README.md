@@ -1,94 +1,196 @@
+<div align="center">
+
+<img src="public/images/logo-square.webp" alt="Seed Atlas Logo" width="104" />
+
 # Seed Atlas
 
-HTML, strikt geprüftes TypeScript und TailwindCSS (Vite-Plugin). Google Fonts (Inter) und Font Awesome Free 6.7.2 werden per CDN eingebunden. Der Seed Explorer unter `/#/seed-explorer` bietet eine lokal berechnete, interaktive Minecraft-Java-Biomkarte.
+**Deine Welt beginnt mit dem richtigen Seed.**
 
-## Seed Explorer
+Entdecke Minecraft-Biome, finde einen passenden Startpunkt und erkunde deine Welt auf einer interaktiven Karte – direkt im Browser.
 
-- Releases: 26.1, 26.1.1, 26.1.2, 26.2 und 26.3; Standard und Große Biome.
-- Vorzeichenbehaftete 64-Bit-Seeds, Zufallsbutton, Verschieben, Maus-/Touch-Zoom, Tastatursteuerung.
-- Overworld-Biomschnitt bei Y=64, keine Geländeoberfläche. X/Z sind auf −10.000 bis +10.000 begrenzt. Die Gesamtübersicht kann außerhalb dieser Grenzen leere Randflächen zeigen, wenn das Seitenverhältnis dies erfordert.
-- Ein oder zwei Worker berechnen 128×128-Kacheln mit Sampling 64/16/4/1. Vor der Anzeige werden die vollständige Übersicht (64 Blöcke/Sample), die Startansicht in ihrer Detailstufe und der geschätzte Weltspawn berechnet. Bis dahin bleibt der abgedunkelte Platzhalter mit Ladebalken sichtbar. Weitere Details laden beim Navigieren nach. Punktabfragen sind auf Blockauflösung. Der Detailcache hat maximal 64 MiB; die Übersicht bleibt separat erhalten.
-- Animierter Spawn-Pin mit ausdrücklich gekennzeichneter Schätzung; die tatsächliche Minecraft-Spawnposition kann abweichen.
-- Bilddownload ausschließlich des sichtbaren Ausschnitts: ein Pixel pro Sample der beim Öffnen des Downloaddialogs aktiven Detailstufe, ohne Bedienelemente und Pin. Ein separater Worker berechnet die Biome einmal und vergleicht verlustfreies WebP mit JPEG (Qualität 90, ohne Chroma-Subsampling). Die kleinere Datei wird automatisch heruntergeladen. Fortschritt, Abbruch und Wiederholung sind im Dialog verfügbar. Bei sehr großen Ausschnitten oder einem WebP-Ladefehler wird JPEG verwendet.
-- Nur ganzzahlige numerische Seeds sind zugelassen. Texte, Datapacks, Mods und andere Dimensionen sind nicht unterstützt.
+![Version](https://img.shields.io/badge/Version-1.0.1-80b857?style=flat-square)
+![Minecraft Java](https://img.shields.io/badge/Minecraft-Java_Edition-538b45?style=flat-square)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?style=flat-square)
+![WebAssembly](https://img.shields.io/badge/Generator-WebAssembly-654ff0?style=flat-square)
 
-Die mitgelieferten Assets `public/wasm/biomes.js` und `biomes.wasm` erlauben sofortige Entwicklung ohne lokale C-Toolchain. Neu erzeugen mit `npm run build:wasm` (Docker erforderlich). Der Docker-Produktionsbuild kompiliert sie selbst mit Emscripten 4.0.15. Quellen und Referenzen stehen in `vendor/README.md`, auslieferbare Lizenzhinweise unter `/wasm/LICENSES.txt`.
+[Funktionen](#was-seed-atlas-bietet) · [Erste Schritte](#erste-schritte) · [Installation](#lokal-starten) · [Deployment](#veröffentlichen) · [Fehler melden](https://github.com/CelduinX/mc-seed-atlas/issues)
 
-Der Bildexport verwendet zusätzlich `public/wasm/jpeg.js` und `jpeg.wasm`, die derselbe Build erstellt, sowie den lokal mitgelieferten WebP-Encoder `/wasm/webp.wasm` aus dem fest gepinnten Paket `@jsquash/webp` 1.5.0. This software is based in part on the work of the Independent JPEG Group.
+</div>
 
-## Startbiom
+---
 
-Unter `/#/biome-finder` stehen 29 Oberwelt-Biome zur Auswahl. Die Kategorien umfassen offene Landschaften, Wälder, Wüste, Schnee und Feuchtgebiete; die Filter zeigen die jeweilige Anzahl. Flüsse, Strände, Küsten, Ozeane, Höhlenbiome und schmale Übergangsbiome sind ausgeschlossen. Hohe Bergbiome werden wegen der Prüfung bei Y=64 ebenfalls nicht angeboten.
+## Was Seed Atlas bietet
 
-Jede Card übergibt eine feste Biom-ID an die Seed-Suche. Geprüft werden das Biom am geschätzten Spawn und der gewählte Mindestanteil im Biomradius; die tatsächliche Minecraft-Spawnposition kann davon abweichen. Seltene Biome und große Mindestradien können längere Suchen erfordern. Für die 23 neu ergänzten Biome werden bis zum Einfügen eigener Screenshots ausdrücklich gekennzeichnete Icon-Platzhalter angezeigt; die vorhandenen sechs Screenshots bleiben erhalten.
+| | Funktion | Das kannst du damit machen |
+| :---: | :--- | :--- |
+| 🌿 | **Startbiom finden** | Aus 29 Oberwelt-Biomen wählen und einen Seed mit dem gewünschten Biom am geschätzten Spawn suchen. |
+| 🗺️ | **Seed Explorer** | Einen Seed eingeben, die Biomkarte verschieben und bis zur Blockauflösung hineinzoomen. |
+| 🎮 | **Passende Minecraft-Version** | 30 Java-Releases von **1.18.2 bis 26.3**, einschließlich Hotfixes, erkunden. |
+| 🌳 | **Zwei Weltvarianten** | Zwischen Standard und Großen Biomen wechseln. |
+| 📥 | **Kartenausschnitt speichern** | Die sichtbare Karte als Bild herunterladen; WebP oder JPEG wird automatisch gewählt. |
+| 🌍 | **Deutsch & Englisch** | Die Oberfläche nutzt deine Browsersprache und lässt sich jederzeit umstellen. |
 
-## Technische Prüfung
+Die Biomgenerierung und Seed-Suche laufen lokal im Browser. Dafür wird kein Minecraft-Server benötigt. Die Karte unterstützt Maus, Tastatur und Touch-Gesten.
 
-```sh
-npm run typecheck
-npm test
-npm run build
-npm run build:wasm
-```
+### Einblicke in die Biomwelt
 
-`npm test` prüft unabhängige Vanilla-Referenzdaten, Kachelübergänge, Seed-Verarbeitung, Grenzen, Zoomanker, Cache, Worker-Abbruch sowie DOM-/Canvas-Bedienung einschließlich Sprachwechsel, HTML-Hot-Update und Ladefehler. Der Integrationstest nutzt jsdom, ein Canvas im Arbeitsspeicher und echte Node-WASM-Worker. Er öffnet keinen Browser und schreibt keine Bilder.
+Die folgenden Bilder sind Minecraft-Biomaufnahmen aus dem Projekt, keine Screenshots der Bedienoberfläche.
 
-Zusätzlich werden Spawn-Schätzungen gegen native Cubiomes-Fixtures, die Startfreigabe, Bildabmessungen und Farben, automatische Formatwahl sowie Download/Abbruch/Fehler geprüft. Die native Spawn-Referenz lässt sich mit `powershell -ExecutionPolicy Bypass -File scripts/validate-spawn.ps1` erneut erzeugen und vergleichen. Ausschnitt-Exportmessungen: `node scripts/benchmark-export.ts`; dieser Lauf schreibt ausschließlich Messdaten in `.cache`.
+<table>
+  <tr>
+    <td align="center" width="33%"><img src="src/assets/biomes/plains.webp" alt="Minecraft-Biom Ebene" width="320" /><br /><strong>Ebene</strong></td>
+    <td align="center" width="33%"><img src="src/assets/biomes/forest.webp" alt="Minecraft-Biom Wald" width="320" /><br /><strong>Wald</strong></td>
+    <td align="center" width="33%"><img src="src/assets/biomes/snowy_taiga.webp" alt="Minecraft-Biom verschneite Taiga" width="320" /><br /><strong>Verschneite Taiga</strong></td>
+  </tr>
+</table>
 
-Den vollständigen Vanilla-Vergleich unter Windows mit Java 25 und PowerShell wiederholen:
+## Erste Schritte
 
-```sh
-npm run test:vanilla
-```
+**Du suchst einen neuen Seed?**
 
-Dieser Test lädt offizielle Release-Serverdateien in `.cache/vanilla`, prüft ihre SHA1-Hashes und ruft deren unveränderten Biomgenerator auf. Minecraft wird dabei nicht als Server gestartet. Nach erfolgreichem Vergleich werden die dauerhaft mitgelieferten Referenzdaten aktualisiert. Prüfergebnisse und Grenzen der Performance-Messung: `docs/seed-explorer-validation.md`.
+1. Öffne **Startbiom** und wähle dein Wunschbiom.
+2. Lege Minecraft-Version, Weltvariante und Biomgröße fest. Die Versionsauswahl zeigt nur Releases, in denen das gewählte Biom vorkommt.
+3. Klicke auf **Seed finden**. Kopiere das Ergebnis oder öffne es direkt im Seed Explorer.
 
-Die kompakte Sprachauswahl bietet Deutsch und Englisch mit lokal eingebundenen Länderflaggen (Deutschland/Großbritannien). Ohne manuelle Auswahl wird die erste unterstützte Sprache aus der Browser-Sprachliste erkannt (`de`/`en`, einschließlich regionaler Varianten); ohne Treffer gilt Englisch. Die manuelle Auswahl wird in Local Storage gespeichert. Die aktive Sprache setzt das HTML-Attribut `lang` und die Texte mit `data-i18n`; Übersetzungen liegen in `src/language.ts`.
+**Du möchtest einen vorhandenen Seed erkunden?**
 
-## Entwicklung
+1. Öffne den **Seed Explorer** und gib deinen numerischen Seed ein.
+2. Wähle dieselbe Minecraft-Version und Weltvariante wie in deiner Welt.
+3. Generiere die Karte, erkunde die Biome und lade bei Bedarf den sichtbaren Ausschnitt herunter.
 
-Voraussetzung: Node.js 24 und npm. Tests und Hilfsskripte laufen mit der nativen TypeScript-Typentfernung von Node; ein zusätzlicher Transpiler ist nicht erforderlich. Lokale TypeScript-Module werden ausdrücklich mit `.ts` importiert.
+> **Gut zu wissen:** Der angezeigte Weltspawn ist eine Schätzung. Die Karte zeigt einen Biomschnitt bei **Y=64**, keine Geländeoberfläche. Seltene Biome und große Suchradien können mehr Zeit benötigen.
 
-```sh
+## Unterstützte Versionen
+
+| Minecraft Java | Verfügbare Releases |
+| :--- | :--- |
+| **1.18** | 1.18.2 |
+| **1.19** | 1.19 und 1.19.1–1.19.4 |
+| **1.20** | 1.20 und 1.20.1–1.20.6 |
+| **1.21** | 1.21 und 1.21.1–1.21.11 |
+| **26.x** | 26.1, 26.1.1, 26.1.2, 26.2 und 26.3 |
+
+Standardwelten und Große Biome werden unterstützt. Die vollständige Versionszuordnung steht in [src/versions.ts](src/versions.ts).
+
+## Lokal starten
+
+Du benötigst **Node.js 24** und npm. Die fertigen WebAssembly-Dateien sind bereits enthalten; für den normalen Start brauchst du keine C-Toolchain und kein Docker.
+
+```bash
+git clone https://github.com/CelduinX/mc-seed-atlas.git
+cd mc-seed-atlas
 npm ci
-npm run typecheck
 npm run dev
 ```
 
-Adresse: http://localhost:5173
+Öffne anschließend **http://localhost:5173**.
 
-Alternativ vollständig mit Docker:
+<details>
+<summary><strong>Alternativ mit Docker starten</strong></summary>
 
-```sh
+```bash
 docker compose -f compose.dev.yaml up --build -d
 ```
 
-CSS und TypeScript werden per Hot Module Replacement aktualisiert. Änderungen an `index.html` ersetzen den Body-Inhalt und aktualisieren Titel, Sprache, Body-Attribute, Metadaten und Stylesheet-Links ohne Seitenreload. Eingaben und lokale DOM-Zustände werden dabei zurückgesetzt. Script-Tags werden nicht erneut ausgeführt; Anwendungscode gehört in `src/main.ts`. Bei HTML-Updates kann JavaScript über das Fenster-Event `app:html-updated` neue Elemente initialisieren. Event-Listener und Timer beim TypeScript-Hot-Update über `import.meta.hot.dispose` aufräumen.
+Die Entwicklungsumgebung ist ebenfalls unter **http://localhost:5173** erreichbar.
 
-Änderungen an Vite-Konfiguration und Abhängigkeiten können einen Neustart erfordern. Docker verwendet Polling, damit Dateiänderungen auch unter Windows erkannt werden.
-
-## Deployment
-
-```sh
-docker compose up --build -d
-```
-
-Adresse: http://localhost:8080 (Port über `PORT` konfigurierbar). Ein mehrstufiger Docker-Build erstellt statische Produktionsdateien, die Nginx ausliefert. Nach Änderungen für das Deployment erneut bauen.
-
-```sh
-docker compose down
+```bash
 docker compose -f compose.dev.yaml down
 ```
 
-## Dateien
+</details>
 
-- `index.html`: HTML-Grundgerüst, Navigation und CDN-Links
-- `src/style.css`: TailwindCSS und Basisschrift
-- `src/theme.css`: Seed-Atlas-Dark-Theme mit Markenfarben und semantischen Farbwerten; z. B. `bg-surface`, `text-primary` und `border-border`
-- `src/main.ts`: Einstiegspunkt für TypeScript
-- `src/seed-explorer.ts`: Kartenoberfläche und Navigation; Worker, Generator und Kachelcache in den zugehörigen Explorer-Modulen
-- `vite.config.ts`: Entwicklungsserver und Live-HTML-Updates
+## Veröffentlichen
 
-CDN-Schrift und Icons benötigen eine Internetverbindung. TailwindCSS wird lokal gebaut, auch für das Deployment.
+### Cloudflare Pages
 
-Dokumentation: [Tailwind mit Vite](https://tailwindcss.com/docs/installation/using-vite), [Vite HMR](https://vite.dev/guide/api-hmr).
+```bash
+npm ci
+npm run build
+```
+
+Der fertige Webauftritt liegt in **`dist/`**. Für einen direkten Upload verwende diesen Ordner oder ein ZIP mit seinem **Inhalt**: `index.html` muss direkt auf der obersten Ebene liegen.
+
+Für einen Git-basierten Build:
+
+| Einstellung | Wert |
+| :--- | :--- |
+| Build-Befehl | `npm run build` |
+| Ausgabeordner | `dist` |
+| Node.js | `24` (über die mitgelieferte `.node-version`) |
+
+Die Node-Version wird über die [Cloudflare-Build-Konfiguration](https://developers.cloudflare.com/pages/configuration/build-image/) festgelegt.
+
+Die Biomaufnahmen werden aus `src/assets/biomes` importiert und beim Build nach `dist/assets` übernommen. Der Website-Build benötigt keine Bilddateien aus `docs`. Schriften und Font-Awesome-Icons werden über CDN geladen.
+
+### Eigener Server mit Docker
+
+```bash
+docker compose up --build -d
+```
+
+Die Website ist unter **http://localhost:8080** erreichbar. Der Produktionsbuild kompiliert WebAssembly und liefert die statischen Dateien über Nginx aus.
+
+## Grenzen und Projektstatus
+
+- **Java Edition, Oberwelt:** Bedrock, Nether, End, Mods und benutzerdefinierte Datapacks sind derzeit nicht unterstützt.
+- **Numerische Seeds:** Unterstützt werden vorzeichenbehaftete 64-Bit-Zahlen. Text-Seeds werden nicht angenommen.
+- **Kartengrenzen:** X und Z reichen jeweils von −10.000 bis +10.000.
+- **Historische Biomgrenzen:** Vor 1.19.3 kann Minecraft durch seinen damaligen Suchcache an einzelnen Grenzen von unabhängigen Kartenabfragen abweichen.
+- **In Entwicklung:** Startseite und Seed Crafter zeigen derzeit einen WIP-Hinweis. Für Biomkarten ohne eigene Aufnahme erscheinen gekennzeichnete Platzhalter.
+
+Die Details zur Genauigkeit und den Einschränkungen findest du in der [technischen Validierung](docs/seed-explorer-validation.md).
+
+## Entwicklung und Qualität
+
+**TypeScript · Vite · Tailwind CSS · WebAssembly · Cubiomes**
+
+```bash
+npm run typecheck   # TypeScript prüfen
+npm test           # Generator-, Worker- und Bedienungstests
+npm run build      # Produktionsbuild erstellen
+```
+
+Die Referenzprüfung umfasst **884.160 unabhängige Vanilla-Punktabfragen** über alle 30 Releases und beide Weltvarianten sowie **300 native Spawn-Referenzen**. Details und Voraussetzungen für die Wiederholung stehen in [docs/seed-explorer-validation.md](docs/seed-explorer-validation.md).
+
+<details>
+<summary><strong>WebAssembly und Vanilla-Referenzen neu erzeugen</strong></summary>
+
+WebAssembly neu kompilieren, mit Docker:
+
+```bash
+npm run build:wasm
+```
+
+Den vollständigen Vanilla-Vergleich unter Windows mit Java 25 und PowerShell ausführen:
+
+```bash
+npm run test:vanilla
+```
+
+Dieser Lauf lädt offizielle Serverdateien und gegebenenfalls deren Mappings, prüft die SHA1-Hashes und fragt den Vanilla-Biomgenerator ab. Minecraft wird dabei nicht als Server gestartet. Für die historischen Releases werden unabhängige Punktabfragen ohne den vorherigen Suchtreffer verglichen.
+
+</details>
+
+Weitere Hinweise: [Entwicklungsdokumentation](docs/development.md) · [Generatorquellen und Lizenzen](vendor/README.md)
+
+## Mitmachen
+
+Fehler gefunden oder eine Idee für Seed Atlas? Erstelle ein [GitHub Issue](https://github.com/CelduinX/mc-seed-atlas/issues). Bei Kartenfehlern helfen **Seed, Minecraft-Version, Weltvariante und X/Z-Koordinaten** besonders.
+
+Für Änderungen am Code: Repository forken, einen eigenen Branch anlegen, die relevanten Prüfungen ausführen und einen Pull Request erstellen. Neue Biomaufnahmen gehören in `src/assets/biomes`; `docs/images` dient als Referenzsammlung.
+
+## Credits und Lizenzhinweise
+
+Seed Atlas wird von [CelduinX](https://github.com/CelduinX) entwickelt.
+
+Die Biomgenerierung basiert auf [Cubiomes](https://github.com/Cubitect/cubiomes) von Cubitect; Versionsanpassungen stammen aus [SeedForge](https://github.com/fwsoapy/seedforge). Beide Komponenten stehen unter der MIT-Lizenz. Der Bildexport verwendet IJG libjpeg und einen WebP-Encoder aus `@jsquash/webp`.
+
+Die Quellen, festgelegten Versionen und Lizenztexte sind unter [vendor/README.md](vendor/README.md) dokumentiert. Die ausgelieferte Website enthält sie unter `/wasm/LICENSES.txt`. Für den eigenen Anwendungscode ist derzeit keine separate Projektlizenz festgelegt.
+
+---
+
+<div align="center">
+  <strong>Seed Atlas · Finde deinen Minecraft-Seed.</strong><br />
+  <a href="https://github.com/CelduinX/mc-seed-atlas">GitHub-Projekt</a> · <a href="https://github.com/CelduinX/mc-seed-atlas/issues">Feedback & Fehlerberichte</a>
+</div>

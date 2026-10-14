@@ -192,6 +192,25 @@ test('popup manages search, cancellation, stale replies, preview recovery, setti
       assert.equal(job.type, 'search');
       if (job.type === 'search') assert.equal(job.biome, Number(card.dataset.biomeId));
     }
+    q('.biome-card[data-biome-id="4"] .biome-card-trigger')!.click();
+    q('dialog [name="version"]', 'select')!.value = '1.18.2';
+    q('dialog [name="version"]', 'select')!.dispatchEvent(new window.Event('change', { bubbles: true }));
+    submit(); assert(workers.at(-1)!.jobs[0]!.type === 'search');
+    q('.biome-card[data-biome-id="184"] .biome-card-trigger')!.click();
+    assert.equal(q('dialog [name="version"]', 'select')!.value, '1.19');
+    assert.equal(q('dialog option[value="1.18.2"]', 'option'), null);
+    const workerCount = workers.length;
+    q('dialog [name="version"]', 'select')!.value = '1.18.2';
+    submit(); assert.equal(workers.length, workerCount);
+    assert.equal(q('dialog [name="version"]', 'select')!.value, '1.19');
+    for (const [biome, oldest, absent] of [[185, '1.20', '1.19.4'], [186, '1.21.4', '1.21.3'], [4, '1.18.2', '1.18.1']] as const) {
+      q(`.biome-card[data-biome-id="${biome}"] .biome-card-trigger`)!.click();
+      const versions = q('dialog [name="version"]', 'select')!;
+      assert.equal(versions.options[versions.options.length - 1]!.value, oldest);
+      assert.equal(q(`dialog option[value="${absent}"]`, 'option'), null);
+      assert([...versions.options].every(option => !option.disabled));
+    }
+    assert.equal(q('dialog [name="version"]', 'select')!.options.length, 30);
     page.dispose(); page = null; assert(workers.at(-1)!.terminated); assert.equal(q('dialog', 'dialog')!, null);
   } finally {
     page?.dispose(); dom.window.close();
