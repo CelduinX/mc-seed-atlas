@@ -14,10 +14,10 @@ import { createBiomeFinder } from '../src/biome-finder.ts';
 test('Explorer links round-trip exact seeds and reject invalid world configurations', () => {
   for (const seed of ['-9223372036854775808', '9223372036854775807']) for (const large of [true, false]) {
     const config = { seed, version: VERSIONS.at(-1)!, large };
-    assert.deepEqual(explorerRoute(explorerLink(config)), { path: '#/seed-explorer', config });
+    assert.deepEqual(explorerRoute(explorerLink(config)), { path: '/seed-explorer', config });
   }
-  assert.deepEqual(explorerRoute('#/seed-explorer'), { path: '#/seed-explorer' });
-  for (const query of ['seed=oops&version=26.3&world=standard', 'seed=1&version=unsupported&world=standard', 'seed=1&version=26.3&world=oops', 'seed=9223372036854775808&version=26.3&world=large']) assert.equal(explorerRoute(`#/seed-explorer?${query}`).error, true);
+  assert.deepEqual(explorerRoute('/seed-explorer'), { path: '/seed-explorer' });
+  for (const query of ['seed=oops&version=26.3&world=standard', 'seed=1&version=unsupported&world=standard', 'seed=1&version=26.3&world=oops', 'seed=9223372036854775808&version=26.3&world=large']) assert.equal(explorerRoute(`/seed-explorer?${query}`).error, true);
 });
 
 test('size filter checks a circular area and enforces the 80 percent threshold', () => {
@@ -79,7 +79,7 @@ test('real WASM search finds exact selected biomes in both world types and rende
 });
 
 test('popup manages search, cancellation, stale replies, preview recovery, settings, language and disposal', async () => {
-  const dom = new JSDOM('<html lang="de"><body><main></main></body></html>', { url: 'http://localhost/#/biome-finder' });
+  const dom = new JSDOM('<html lang="de"><body><main></main></body></html>', { url: 'http://localhost/biome-finder' });
   const { window } = dom, workers: FakeWorker[] = [];
   window.HTMLDialogElement.prototype.showModal = function () { this.open = true; };
   window.HTMLDialogElement.prototype.close = function () { this.open = false; };

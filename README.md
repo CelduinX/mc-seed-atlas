@@ -125,6 +125,8 @@ Die Biomaufnahmen werden aus `src/assets/biomes` importiert und beim Build nach 
 
 ### Eigener Server mit Docker
 
+Die Seiten verwenden direkte URLs: `/`, `/biome-finder`, `/seed-crafter` und `/seed-explorer`. Die mitgelieferte Datei `public/_redirects` wird nach `dist` übernommen und ermöglicht direkte Seitenaufrufe auf Cloudflare Pages. Details: [Cloudflare Redirects](https://developers.cloudflare.com/pages/configuration/redirects/). Der Docker-Webserver verwendet einen entsprechenden Nginx-Fallback auf `index.html`.
+
 ```bash
 docker compose up --build -d
 ```
@@ -137,7 +139,7 @@ Die Website ist unter **http://localhost:8080** erreichbar. Der Produktionsbuild
 - **Numerische Seeds:** Unterstützt werden vorzeichenbehaftete 64-Bit-Zahlen. Text-Seeds werden nicht angenommen.
 - **Kartengrenzen:** X und Z reichen jeweils von −10.000 bis +10.000.
 - **Historische Biomgrenzen:** Vor 1.19.3 kann Minecraft durch seinen damaligen Suchcache an einzelnen Grenzen von unabhängigen Kartenabfragen abweichen.
-- **In Entwicklung:** Startseite und Seed Crafter zeigen derzeit einen WIP-Hinweis. Für Biomkarten ohne eigene Aufnahme erscheinen gekennzeichnete Platzhalter.
+- **Startseite & Editor:** Die Startseite stellt die individuelle Seed-Suche vor, bietet direkte Einstiege zu Startbiom, Seed Crafter und Seed Explorer sowie sechs Templates. Seed Crafter enthält ausschließlich den Parameter-Editor. Templates und Editor bleiben unabhängig. Ihre Seed-Suche befindet sich noch im UI-Entwurf; die Startbiom-Suche ist bereits verfügbar. Für Biomkarten ohne eigene Aufnahme erscheinen gekennzeichnete Platzhalter.
 
 Die Details zur Genauigkeit und den Einschränkungen findest du in der [technischen Validierung](docs/seed-explorer-validation.md).
 

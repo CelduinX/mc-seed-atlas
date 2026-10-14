@@ -14,7 +14,7 @@ import { createCanvas, ImageData } from '@napi-rs/canvas';
 test('technical DOM/canvas integration: workers, navigation, translation, reload, recovery and performance', { timeout: 60000 }, async () => {
   // No browser is launched and no screenshot/image file is created or viewed.
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-  const dom = new JSDOM(html, { url: 'http://localhost/#/seed-explorer', pretendToBeVisual: true });
+  const dom = new JSDOM(html, { url: 'http://localhost/seed-explorer', pretendToBeVisual: true });
   const { window } = dom;
   const bodyHtml = window.document.body.innerHTML;
   const canvasStore = new WeakMap<HTMLCanvasElement, Canvas>(), timings: number[] = [], transferTimings: number[] = [], coarseTimings: number[] = [];
@@ -83,6 +83,7 @@ test('technical DOM/canvas integration: workers, navigation, translation, reload
     const start = Date.now(); while (!predicate()) { if (Date.now() - start > 15000) throw new Error('DOM condition timed out'); await new Promise<void>(resolve => setTimeout(resolve, 10)); }
   };
   const q = createQuery(window.document);
+  const navigate = (path: string) => { window.history.pushState(null, '', path); window.dispatchEvent(new window.PopStateEvent('popstate')); };
   const submit = (selector: string) => q(selector)!.dispatchEvent(new window.Event('submit', { bubbles: true, cancelable: true }));
   const event = (type: string, values: Record<string, number | string>) => Object.assign(new window.Event(type, { bubbles: true, cancelable: true }), values);
   try {
@@ -161,9 +162,9 @@ test('technical DOM/canvas integration: workers, navigation, translation, reload
     await wait(() => !q('[data-action="retry"]')!.hidden);
     assert.match(q('.explorer-status')!.textContent!, /could not be loaded/); assert.equal(liveWorkers.size, 0);
     failWorkers = false; q('[data-action="retry"]')!.click(); await wait(() => q('.explorer-status')!.textContent!.includes('Map ready'));
-    window.location.hash = '';
+    navigate('/');
     await wait(() => !q('.explorer')!); assert.equal(liveWorkers.size, 0);
-    window.location.hash = '#/biome-finder';
+    navigate('/biome-finder');
     await wait(() => q('[data-biome="1"]')!);
     q('[data-biome="1"]')!.click(); assert(q('dialog', 'dialog')!.open);
     q('dialog [name="world"]', 'select')!.value = 'large';
@@ -173,30 +174,30 @@ test('technical DOM/canvas integration: workers, navigation, translation, reload
     assert(!q('.start-biome-pin')!.hidden);
     const foundSeed = q('.start-biome-seed', 'input')!.value;
     const foundLink = q('[data-start="open"]', 'a')!.getAttribute('href');
-    q('[data-start="open"]', 'a')!.addEventListener('click', event => event.preventDefault(), { once: true });
     q('[data-start="open"]', 'a')!.dispatchEvent(new window.MouseEvent('click', { bubbles: true, cancelable: true })); assert(!q('dialog', 'dialog')!.open);
-    // Anchor navigation is stubbed for downloads in this test; apply its destination explicitly.
-    assert(foundLink); window.location.hash = foundLink;
+    assert(foundLink); assert.equal(window.location.pathname + window.location.search, foundLink); assert.equal(window.location.hash, '');
     await wait(() => q('.explorer-status')!?.textContent!.includes('Map ready'));
     assert.equal(q('[name="seed"]', 'input')!.value, foundSeed);
     assert.equal(q('[name="version"]', 'select')!.value, '26.3');
     assert.equal(q('[name="settings"]', 'select')!.value, 'large');
-    assert.equal(q('a[href="#/seed-explorer"]', 'a')!.getAttribute('aria-current'), 'page');
+    assert.equal(q('.navigation-link[href="/seed-explorer"]', 'a')!.getAttribute('aria-current'), 'page');
     const estimatedSpawn = received.filter(data => data.type === 'spawn').at(-1)!;
     assert.equal(q('.explorer-position')!.textContent!, `X: ${estimatedSpawn.x} · Z: ${estimatedSpawn.z}`);
-    window.location.hash = '#/seed-explorer?seed=bad&version=26.3&world=standard';
+    navigate('/seed-explorer?seed=bad&version=26.3&world=standard');
     await wait(() => q('#seed-error')! && !q('#seed-error')!.hidden);
     assert.match(q('#seed-error')!.textContent!, /world settings are invalid/);
     assert.equal(liveWorkers.size, 0);
-    window.location.hash = '';
+    navigate('/');
     await wait(() => !q('.explorer')!);
     assert(q('[data-page="home"]')!);
-    assert(q('[data-page="home"]')!.querySelector('.wip-notice'));
-    assert.equal(q('a[href="#/home"]', 'a')!.getAttribute('aria-current'), 'page');
-    window.location.hash = '#/seed-crafter';
+    assert(q('[data-page="home"]')!.querySelector('.home-hero'));
+    assert(q('[data-page="home"]')!.querySelector('.crafter-template-grid'));
+    assert.equal(q('.navigation-link[href="/"]', 'a')!.getAttribute('aria-current'), 'page');
+    navigate('/seed-crafter');
     await wait(() => q('[data-page="seed-crafter"]')!);
-    assert(q('[data-page="seed-crafter"]')!.querySelector('.wip-notice'));
-    assert.equal(q('a[href="#/seed-crafter"]', 'a')!.getAttribute('aria-current'), 'page');
+    assert(q('[data-page="seed-crafter"]')!.querySelector('.crafter-controls'));
+    assert.equal(q('[data-page="seed-crafter"]')!.querySelector('.crafter-template-grid'), null);
+    assert.equal(q('.navigation-link[href="/seed-crafter"]', 'a')!.getAttribute('aria-current'), 'page');
     assert.equal(liveWorkers.size, 0);
     mkdirSync('.cache', { recursive: true });
     const percentile = (list: number[]) => [...list].sort((a,b) => a-b)[Math.floor((list.length - 1) * .95)]!;

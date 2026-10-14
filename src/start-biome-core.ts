@@ -1,6 +1,7 @@
 import type { BiomeSize, WorldConfig } from './types.ts';
 import { parseSeed, isVersion } from './explorer-core.ts';
 import { biomeAvailable } from './versions.ts';
+import { normalizeAppPath } from './app-router.ts';
 
 // Broad surface biomes only: no shores, rivers, oceans, cave biomes or narrow
 // transition biomes. High mountain biomes are unsuitable for our Y=64 check.
@@ -16,11 +17,12 @@ export function biomeSizeRadius(size: BiomeSize, large = false) {
   return BIOME_SIZES[size] * (large ? 4 : 1);
 }
 export function explorerLink(config: WorldConfig) {
-  return `#/seed-explorer?${new URLSearchParams({ seed: config.seed, version: config.version, world: config.large ? 'large' : 'standard' })}`;
+  return `/seed-explorer?${new URLSearchParams({ seed: config.seed, version: config.version, world: config.large ? 'large' : 'standard' })}`;
 }
-export function explorerRoute(hash: string): { path: string; config?: WorldConfig; error?: boolean } {
-  const [path = '', query = ''] = hash.split('?');
-  if (path !== '#/seed-explorer' || !query) return { path };
+export function explorerRoute(route: string): { path: string; config?: WorldConfig; error?: boolean } {
+  const [pathname = '', query = ''] = route.split('?');
+  const path = normalizeAppPath(pathname);
+  if (path !== '/seed-explorer' || !query) return { path };
   try {
     const params = new URLSearchParams(query);
     const seed = parseSeed(params.get('seed'));

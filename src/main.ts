@@ -6,6 +6,9 @@ import { createPageTransitions } from './page-transitions.ts';
 import { createViewportLayout } from './viewport-layout.ts';
 import { createSeedExplorer } from './seed-explorer.ts';
 import { createBiomeFinder } from './biome-finder.ts';
+import { createSeedCrafter } from './seed-crafter.ts';
+import { createHome } from './home.ts';
+import { createAppRouter, normalizeAppPath } from './app-router.ts';
 import { explorerRoute } from './start-biome-core.ts';
 import { LANGUAGE_STORAGE_KEY, normalizePreference, resolveLanguage, translations } from './language.ts';
 
@@ -13,6 +16,8 @@ let preference: LanguagePreference = 'auto';
 let headerNavigation: ReturnType<typeof createHeaderNavigation> = null;
 let seedExplorer: ReturnType<typeof createSeedExplorer> | null = null;
 let biomeFinder: ReturnType<typeof createBiomeFinder> | null = null;
+let seedCrafter: ReturnType<typeof createSeedCrafter> | null = null;
+let home: ReturnType<typeof createHome> | null = null;
 const pageTransitions = createPageTransitions();
 const viewportLayout = createViewportLayout();
 function onRouteChange() {
@@ -24,32 +29,19 @@ function renderPage() {
   seedExplorer = null;
   biomeFinder?.dispose();
   biomeFinder = null;
+  seedCrafter?.dispose();
+  seedCrafter = null;
+  home?.dispose();
+  home = null;
   const container = document.querySelector<HTMLElement>('main .page-container');
   container?.replaceChildren();
-  const route = explorerRoute(location.hash);
-  if (!route.path || route.path === '#') route.path = '#/home';
-  if (container && ['#/home', '#/seed-crafter'].includes(route.path)) {
-    const page = document.createElement('section');
-    page.dataset.page = route.path.slice(2);
-    page.className = 'wip-page';
-    page.dataset.i18nAriaLabel = route.path === '#/home' ? 'home' : 'seedCrafter';
-    page.setAttribute('aria-label', translated(translations[document.documentElement.lang === 'de' ? 'de' : 'en'], page.dataset.i18nAriaLabel));
-    page.innerHTML = `
-      <div class="wip-notice">
-        <span class="wip-badge">WIP</span>
-        <h1 data-i18n="wipTitle"></h1>
-        <p data-i18n="wipDescription"></p>
-      </div>
-    `;
-    page.querySelectorAll<HTMLElement>('[data-i18n]').forEach(element => {
-      element.textContent = translated(translations[document.documentElement.lang === 'de' ? 'de' : 'en'], element.dataset.i18n);
-    });
-    container.append(page);
-  }
-  if (container && route.path === '#/seed-explorer') seedExplorer = createSeedExplorer(container, { initialConfig: route.config, invalidConfig: route.error });
-  if (container && route.path === '#/biome-finder') biomeFinder = createBiomeFinder(container);
+  const route = explorerRoute(location.pathname + location.search);
+  if (container && route.path === '/') home = createHome(container);
+  if (container && route.path === '/seed-explorer') seedExplorer = createSeedExplorer(container, { initialConfig: route.config, invalidConfig: route.error });
+  if (container && route.path === '/biome-finder') biomeFinder = createBiomeFinder(container);
+  if (container && route.path === '/seed-crafter') seedCrafter = createSeedCrafter(container);
   document.querySelectorAll<HTMLAnchorElement>('.navigation-link').forEach(link => {
-    if (link.hash === route.path && ['#/home', '#/seed-crafter', '#/seed-explorer', '#/biome-finder'].includes(route.path)) link.setAttribute('aria-current', 'page');
+    if (normalizeAppPath(link.pathname) === route.path && ['/', '/seed-crafter', '/seed-explorer', '/biome-finder'].includes(route.path)) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
   });
 }
@@ -171,8 +163,9 @@ window.addEventListener('storage', onStorageChange);
 window.addEventListener('app:html-updated', onHtmlUpdated);
 applyLanguage();
 initializeNavigation();
+const router = createAppRouter(onRouteChange);
 renderPage();
-window.addEventListener('hashchange', onRouteChange);
+
 
 if (import.meta.hot) {
   import.meta.hot.accept();
@@ -189,10 +182,12 @@ if (import.meta.hot) {
     window.removeEventListener('storage', onStorageChange);
     window.removeEventListener('app:html-updated', onHtmlUpdated);
     headerNavigation?.dispose();
-    window.removeEventListener('hashchange', onRouteChange);
+    router.dispose();
     pageTransitions.dispose();
     viewportLayout.dispose();
     seedExplorer?.dispose();
     biomeFinder?.dispose();
+    seedCrafter?.dispose();
+    home?.dispose();
   });
 }
